@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.env
+data/*.db
+data/arena.db
+# Real encrypted business uploads never go in git. The committed plaintext dev
+# holdout (data/holdouts/text.jsonl) is public TriviaQA-style sample data only.
+data/holdouts/*.enc
