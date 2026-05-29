@@ -1,0 +1,37 @@
+# Fly.io config for arena-api.
+# First time:  fly launch --no-deploy --copy-config --name arena-api
+#              fly volumes create arena_data --size 1 --region iad
+#              fly secrets set ARENA_HOLDOUT_KEY=$(python3 -c "import os,base64;print(base64.b64encode(os.urandom(32)).decode())")
+#              fly secrets set ANTHROPIC_API_KEY=sk-ant-...
+#              fly deploy
+app = "arena-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ARENA_DB_PATH = "/data/arena.db"
+  JUDGE_MODEL = "claude-opus-4-7"
+
+[http_service]
+  internal_port = 8001
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.checks]
+    [[http_service.checks.http]]
+      method = "get"
+      path = "/api/v1/health"
+      interval = "15s"
+      timeout = "5s"
+
+[[mounts]]
+  source = "arena_data"
+  destination = "/data"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

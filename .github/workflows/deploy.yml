@@ -1,0 +1,21 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Fly.io
+    runs-on: ubuntu-latest
+    concurrency: deploy-group
+    # No-op until FLY_API_TOKEN is added (Settings → Secrets → Actions), so
+    # pushes don't fail red before the project is wired up.
+    if: ${{ secrets.FLY_API_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
